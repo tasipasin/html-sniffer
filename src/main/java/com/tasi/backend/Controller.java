@@ -2,6 +2,8 @@
 package com.tasi.backend;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.tasi.backend.search.SearchController;
 import com.tasi.backend.search.SearchResult;
 import com.tasi.backend.utils.StringUtils;
@@ -13,6 +15,7 @@ import spark.Response;
  */
 public class Controller {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
     /** Search Controller. */
     private final SearchController search = new SearchController();
     /** Answer result String template. */
@@ -40,6 +43,7 @@ public class Controller {
         if (result.trim().isEmpty()) {
             res.status(HttpStatus.BAD_REQUEST_400);
         }
+        LOGGER.info("Search request for keyword [{}] ended with ID [{}]", keyword, result);
         return result;
     }
 

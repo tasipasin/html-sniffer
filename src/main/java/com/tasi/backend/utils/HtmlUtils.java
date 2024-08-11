@@ -30,7 +30,7 @@ public class HtmlUtils {
      * @return the page HTML content.
      */
     public static String getDataContent(String url) {
-        String content = null;
+        String content = "";
         URLConnection connection = null;
         try {
             connection = new URL(url).openConnection();
@@ -85,7 +85,13 @@ public class HtmlUtils {
      * @param domain Root domain.
      */
     public static void filterSameDomainLinks(Set<String> linkList, String domain) {
-        linkList.removeIf(link -> !link.startsWith(domain) && (link.contains("http") || !link.startsWith("/")));
+        // Removes any links that:
+        // 1.   Does not ends with .html extension OR
+        // 2.   Do not starts with the required domain AND
+        // 2.1. Contains http OR
+        // 2.2. Do not starts with a single slash
+        linkList.removeIf(link -> !link.endsWith(".html") || !link.startsWith(domain)
+                && (link.contains("http") || !link.startsWith("/")));
     }
 
     /**
@@ -101,7 +107,7 @@ public class HtmlUtils {
         linkList.forEach(link -> {
             String resultLink = link;
             if (!resultLink.contains("http")) {
-                resultLink = (domain + resultLink);
+                resultLink = (domain + resultLink).replaceAll("(?<!:)/+", "/");
             }
             result.add(resultLink);
         });
