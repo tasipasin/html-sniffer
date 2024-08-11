@@ -19,15 +19,6 @@ public class Controller {
     private static final String RESULT_TEMPLATE = "{\"id\": %s}";
 
     /**
-     * Class to perform request verifications and assign the work to the best fit.
-     */
-    public Controller() {
-        // Initialize and run search thread
-        Thread searchThread = new Thread(search);
-        searchThread.start();
-    }
-
-    /**
      * Checks the request for a new search and returns the Search ID.
      * @param request The Request.
      * @param res The Result Object.

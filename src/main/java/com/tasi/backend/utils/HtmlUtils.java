@@ -85,6 +85,39 @@ public class HtmlUtils {
      * @param domain Root domain.
      */
     public static void filterSameDomainLinks(Set<String> linkList, String domain) {
-        linkList.removeIf(link -> !link.startsWith(domain) && link.contains("http"));
+        linkList.removeIf(link -> !link.startsWith(domain) && (link.contains("http") || !link.startsWith("/")));
+    }
+
+    /**
+     * Given a list of links, for each relative link appends the domain to it.
+     * @param linkList List of links.
+     * @param domain The domains.
+     * @return A normalized list of links
+     */
+    public static Set<String> addDomainInRelativeLinks(Set<String> linkList, String domain) {
+        Set<String> result = new HashSet<>();
+        // Iterate over the whole list checking if is a relative link to concanate de domain
+        // and puts all links in a return list
+        linkList.forEach(link -> {
+            String resultLink = link;
+            if (!resultLink.contains("http")) {
+                resultLink = (domain + resultLink);
+            }
+            result.add(resultLink);
+        });
+        return result;
+    }
+
+    /**
+     * Given a HTML String, all the links of the same origin are returned normalized
+     * if they're relative.
+     * @param html Html String.
+     * @param domain Root Domain.
+     * @return A list of links from the current HTML normalized by the domain.
+     */
+    public static Set<String> getFilteredAndNormalizedHrefs(String html, String domain) {
+        Set<String> originalHrefs = getLinksInContent(html);
+        HtmlUtils.filterSameDomainLinks(originalHrefs, domain);
+        return HtmlUtils.addDomainInRelativeLinks(originalHrefs, domain);
     }
 }

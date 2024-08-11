@@ -5,19 +5,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SearchController implements Runnable {
+/**
+ * Search Controller class.
+ */
+public class SearchController {
 
+    /** Result list. */
     private final List<SearchResult> results = new ArrayList<>();
 
-    @Override
-    public void run() {
-        //
-    }
-
+    /**
+     * Execute procedures to begin a new search and returns an identifier
+     * of the started search for future consulting.
+     * @param keyword Keyword to be searched.
+     * @return An ID of the search
+     */
     public String beginsNewSearch(String keyword) {
-        if (null != keyword && !keyword.isEmpty()) {
+        if (null != keyword) {
+            // Creates a new SearchResult with a random ID
             SearchResult sr = new SearchResult();
             this.results.add(sr);
+            // Creates a thread to keep searching in background
+            Thread searchThread = new Thread(new Search(sr, keyword));
+            searchThread.start();
+            // Returns the ID
             return sr.getId();
         }
         return null;
