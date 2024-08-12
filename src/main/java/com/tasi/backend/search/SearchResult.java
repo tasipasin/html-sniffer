@@ -38,8 +38,8 @@ public class SearchResult {
      * Returns the Status.
      * @return the Status.
      */
-    public String getStatus() {
-        return this.status.getName();
+    public EnumState getStatus() {
+        return this.status;
     }
 
     /**

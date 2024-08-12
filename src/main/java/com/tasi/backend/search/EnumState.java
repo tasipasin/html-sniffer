@@ -1,31 +1,16 @@
 
 package com.tasi.backend.search;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * State Enum.
  */
 public enum EnumState {
-
     /** Active state (when the search is still running). */
-    ACTIVE("active"),
+    @SerializedName("active")
+    ACTIVE,
     /** Done state (when the search is finished). */
-    DONE("done");
-
-    /** Name used in enum. */
-    private final String mName;
-
-    /**
-     * State Enum.
-     */
-    EnumState(String name) {
-        this.mName = name;
-    }
-
-    /**
-     * Returns the name of the state.
-     * @return the name of the state.
-     */
-    public String getName() {
-        return this.mName;
-    }
+    @SerializedName("done")
+    DONE;
 }
