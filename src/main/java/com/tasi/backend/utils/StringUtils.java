@@ -2,6 +2,7 @@
 package com.tasi.backend.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.util.Map;
 
 /**
@@ -28,14 +29,11 @@ public class StringUtils {
     }
 
     /**
-     * Convert an object to a Json String.
+     * Convert an object to a JsonObject.
      * @param obj Object to be converted.
-     * @return Object's Json String.
+     * @return A JsonObject of the Object.
      */
-    public static String objectToString(Object obj) {
-        if (null == obj) {
-            return "";
-        }
-        return StringUtils.GSON.toJson(obj);
+    public static JsonObject objectToJsonObject(Object obj) {
+        return (JsonObject) GSON.toJsonTree(obj);
     }
 }

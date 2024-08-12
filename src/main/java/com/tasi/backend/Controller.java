@@ -25,6 +25,7 @@ public class Controller {
      * @return Returns the answer to the request. Expected to be an ID.
      */
     public JsonObject postRequest(Request request, Response res) {
+        res.type("application/json");
         JsonObject result = null;
         // Get the keyword and validates it
         String keyword = getParameter(request, "keyword");
@@ -34,11 +35,12 @@ public class Controller {
         if (null != id) {
             result = new JsonObject();
             result.addProperty("id", id);
-            res.type("application/json");
         }
         // If the keyword is invalid or not passed, returns a Bad Request
         if (null == result) {
             res.status(HttpStatus.BAD_REQUEST_400);
+            result = Controller.makeError(HttpStatus.BAD_REQUEST_400,
+                    "field \'keyword\' is required (from 4 up to 32 chars)");
         }
         LOGGER.info("Search request for keyword [{}] ended with ID [{}]", keyword, id);
         return result;
@@ -50,18 +52,34 @@ public class Controller {
      * @param res Response.
      * @return Returns the current Search Result.
      */
-    public String getRequest(Request request, Response res) {
-        SearchResult result = null;
+    public JsonObject getRequest(Request request, Response res) {
+        res.type("application/json");
+        JsonObject result = null;
         // Gets the parameter as ID
         String id = request.params("id");
-        if (null != id) {
-            // Returns the Search Result of the ID
-            result = SearchController.getInstance().getSearchResultById(id);
+        // Returns the Search Result of the ID
+        SearchResult sr = SearchController.getInstance().getSearchResultById(id);
+        if (sr != null) {
+            result = StringUtils.objectToJsonObject(sr);
         }
         if (null == result) {
             res.status(HttpStatus.BAD_REQUEST_400);
+            result = Controller.makeError(HttpStatus.BAD_REQUEST_400, String.format("crawl not found: %s", id));
         }
-        return StringUtils.objectToString(result);
+        return result;
+    }
+
+    /**
+     * Makes a layout default error message.
+     * @param code Error code.
+     * @param message Error message.
+     * @return A JsonObject with the error.
+     */
+    private static JsonObject makeError(int code, String message) {
+        JsonObject jsonObj = new JsonObject();
+        jsonObj.addProperty("code", code);
+        jsonObj.addProperty("message", message);
+        return jsonObj;
     }
 
     /**
