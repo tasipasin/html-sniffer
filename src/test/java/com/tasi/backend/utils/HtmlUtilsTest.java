@@ -20,32 +20,29 @@ class HtmlUtilsTest {
     void getAnchorHrefs() {
         String content = HtmlUtils.getDataContent(ORIGIN);
         Set<String> hrefs = HtmlUtils.getLinksInContent(content);
+        HtmlUtils.filterSameDomainLinks(hrefs, ORIGIN);
         Assertions.assertTrue(!hrefs.isEmpty());
     }
 
     @Test
     void filterDomain() {
         Set<String> hrefs = new HashSet<>();
+        hrefs.add("https://www.capterra.com/p/207190/WinRAR/");
+        hrefs.add("https://www.youtube.com/WinRAR-RARLAB");
         // This must be keeped
-        hrefs.add("/reg/");
+        hrefs.add("/windows-11-support-statement.html");
+        hrefs.add("https://www.softlay.com/downloads/winrar");
+        hrefs.add("https://maddownload.com/utilities/file-compression/winrar");
         // This must be keeped
-        hrefs.add("/settings");
+        hrefs.add("https://www.win-rar.com/industry.html");
         // This must be keeped
-        hrefs.add("/groups/discover/");
-        hrefs.add("https://developers.facebook.com/?ref=pf");
-        // This must be keeped
-        hrefs.add("/help/?ref=pf");
-        // This must be keeped
-        hrefs.add("/login/");
-        hrefs.add("https://messenger.com/");
-        hrefs.add("https://www.facebook.com/watch/");
+        hrefs.add("/predownload.html");
         hrefs.add("https://www.facebook.com/winrar/");
         // This must be keeped
         hrefs.add("/cookies.html");
         // This must be keeped
         hrefs.add("/industry.html");
         hrefs.add("https://winrar.informer.com/");
-        // This must be keeped
         hrefs.add("/predownload.html?&Version=32bit");
         hrefs.add("https://www.moosoft.com/software/winrar/");
         // This must be keeped
@@ -73,34 +70,38 @@ class HtmlUtilsTest {
         hrefs.add("https://www.win-rar.com/partners.html");
         // This must be keeped
         hrefs.add("https://www.win-rar.com/news.html");
-        // This must be keeped
-        hrefs.add("/policies/cookies/");
-        hrefs.add("https://pay.facebook.com/");
-        hrefs.add(
-                "https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.instagram.com%2F&h=AT3nS-Sc_s8fq0vUa174yiokS9kiw46kP3_g2jvSn0Tv95zNO1QAmMjgj1c3zGwrjQeLaO1lA6DX9sEl08i4XLRdFdbmzzY8FeYJHT_8UMF1cyzgfpM-JiACn0BOutFwdwauRZrGYrKXFpZo");
-        hrefs.add("help/637205020878504");
-        // This must be keeped
-        hrefs.add("/fundraisers/");
-        hrefs.add("https://ar-ar.facebook.com/");
-        // This must be keeped
-        hrefs.add("/ad_campaign/landing.php?placement=pflo&campaign_id=402047449186&nav_source=unknown&extra_1=auto");
-        // This must be keeped
-        hrefs.add("/pages/create/?ref_type=site_footer");
-        hrefs.add("https://about.meta.com/");
-        hrefs.add("https://it-it.facebook.com/");
-        hrefs.add("https://hi-in.facebook.com/");
         HtmlUtils.filterSameDomainLinks(hrefs, ORIGIN);
         Assertions.assertFalse(hrefs.isEmpty());
-        Assertions.assertEquals(21, hrefs.size());
+        Assertions.assertEquals(14, hrefs.size());
     }
 
     @Test
     void normalizeLinks() {
         Set<String> hrefs = new HashSet<>();
         // This must stay after filtering
-        hrefs.add("/reg/");
+        hrefs.add("/features.html");
         Set<String> normalized = HtmlUtils.addDomainInRelativeLinks(hrefs, ORIGIN);
         Assertions.assertFalse(normalized.isEmpty());
-        Assertions.assertEquals(ORIGIN + "/reg/", normalized.iterator().next());
+        Assertions.assertEquals(ORIGIN + "features.html", normalized.iterator().next());
+    }
+
+    @Test
+    void normalizeLinksHtml() {
+        Set<String> hrefs = new HashSet<>();
+        // This must stay after filtering
+        hrefs.add("/features.html");
+        Set<String> normalized = HtmlUtils.addDomainInRelativeLinks(hrefs, ORIGIN + "index.html");
+        Assertions.assertFalse(normalized.isEmpty());
+        Assertions.assertEquals(ORIGIN + "features.html", normalized.iterator().next());
+    }
+
+    @Test
+    void normalizeRelativeLinks() {
+        Set<String> hrefs = new HashSet<>();
+        // This must stay after filtering
+        hrefs.add("../features.html");
+        Set<String> normalized = HtmlUtils.addDomainInRelativeLinks(hrefs, ORIGIN + "folder/index.html");
+        Assertions.assertFalse(normalized.isEmpty());
+        Assertions.assertEquals(ORIGIN + "features.html", normalized.iterator().next());
     }
 }

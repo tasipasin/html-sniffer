@@ -86,12 +86,12 @@ public class HtmlUtils {
      */
     public static void filterSameDomainLinks(Set<String> linkList, String domain) {
         // Removes any links that:
-        // 1.   Does not ends with .html extension OR
-        // 2.   Do not starts with the required domain AND
+        // 1. Does not ends with .html extension OR
+        // 2. Do not starts with the required domain AND
         // 2.1. Contains http OR
         // 2.2. Do not starts with a single slash
         linkList.removeIf(link -> !link.endsWith(".html") || !link.startsWith(domain)
-                && (link.contains("http") || !link.startsWith("/")));
+                && (link.contains("http")));
     }
 
     /**
@@ -100,14 +100,27 @@ public class HtmlUtils {
      * @param domain The domains.
      * @return A normalized list of links
      */
-    public static Set<String> addDomainInRelativeLinks(Set<String> linkList, String domain) {
+    public static Set<String> addDomainInRelativeLinks(Set<String> linkList, final String domain) {
         Set<String> result = new HashSet<>();
         // Iterate over the whole list checking if is a relative link to concanate de domain
         // and puts all links in a return list
         linkList.forEach(link -> {
             String resultLink = link;
             if (!resultLink.contains("http")) {
-                resultLink = (domain + resultLink).replaceAll("(?<!:)/+", "/");
+                String normalizedDomain = domain;
+                // Checks if it ends with html and rip it off
+                if (normalizedDomain.contains(".html")) {
+                    int lastSlash = normalizedDomain.lastIndexOf("/");
+                    normalizedDomain = normalizedDomain.replace(normalizedDomain.substring(lastSlash + 1), "");
+                }
+                // Checks if it is a relative to a parent directory
+                if (resultLink.startsWith("..")) {
+                    String[] parts = normalizedDomain.split("/");
+                    String toReplace = parts[parts.length - 1];
+                    String substring = normalizedDomain.substring(normalizedDomain.lastIndexOf(toReplace));
+                    normalizedDomain = normalizedDomain.replace(substring, "");
+                }
+                resultLink = (normalizedDomain + resultLink.replace("..", "")).replaceAll("(?<!:)/+", "/");
             }
             result.add(resultLink);
         });
