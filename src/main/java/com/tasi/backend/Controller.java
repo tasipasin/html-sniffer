@@ -4,6 +4,7 @@ package com.tasi.backend;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.gson.JsonObject;
 import com.tasi.backend.search.SearchController;
 import com.tasi.backend.search.SearchResult;
 import com.tasi.backend.utils.StringUtils;
@@ -16,8 +17,6 @@ import spark.Response;
 public class Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    /** Answer result String template. */
-    private static final String RESULT_TEMPLATE = "{\"id\": %s}";
 
     /**
      * Checks the request for a new search and returns the Search ID.
@@ -25,8 +24,8 @@ public class Controller {
      * @param res The Result Object.
      * @return Returns the answer to the request. Expected to be an ID.
      */
-    public String postRequest(Request request, Response res) {
-        String result = "";
+    public JsonObject postRequest(Request request, Response res) {
+        JsonObject result = null;
         // Get the keyword and validates it
         String keyword = getParameter(request, "keyword");
         if (Controller.validateKeyword(keyword)) {
@@ -34,14 +33,16 @@ public class Controller {
             // returns an ID of the search
             String id = SearchController.getInstance().beginsNewSearch(keyword);
             if (null != id) {
-                result = String.format(RESULT_TEMPLATE, id);
+                result = new JsonObject();
+                result.addProperty("id", id);
+                res.type("application/json");
             }
         }
         // If the keyword is invalid or not passed, returns a Bad Request
-        if (result.trim().isEmpty()) {
+        if (null == result) {
             res.status(HttpStatus.BAD_REQUEST_400);
         }
-        LOGGER.info("Search request for keyword [{}] ended with ID [{}]", keyword, result);
+        LOGGER.info("Search request for keyword [{}] ended with [{}]", keyword, result);
         return result;
     }
 
