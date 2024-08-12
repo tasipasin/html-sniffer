@@ -27,7 +27,7 @@ public class SearchController {
      * @return An ID of the search
      */
     public String beginsNewSearch(String keyword) {
-        if (null != keyword) {
+        if (SearchController.validateKeyword(keyword)) {
             // Creates a new SearchResult with a random ID
             SearchResult sr = new SearchResult();
             this.results.add(sr);
@@ -50,6 +50,16 @@ public class SearchController {
                 .filter(result -> Objects.equals(result.getId(), idString))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Validates if the keyword request for searching has length
+     * between 4 and 32, included.
+     * @param keyword The keyword.
+     * @return The keyword validation.
+     */
+    private static boolean validateKeyword(String keyword) {
+        return null != keyword && keyword.length() >= 4 && keyword.length() <= 32;
     }
 
     /**

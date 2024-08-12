@@ -28,21 +28,19 @@ public class Controller {
         JsonObject result = null;
         // Get the keyword and validates it
         String keyword = getParameter(request, "keyword");
-        if (Controller.validateKeyword(keyword)) {
-            // Tells the search controller to start a new search and
-            // returns an ID of the search
-            String id = SearchController.getInstance().beginsNewSearch(keyword);
-            if (null != id) {
-                result = new JsonObject();
-                result.addProperty("id", id);
-                res.type("application/json");
-            }
+        // Tells the search controller to start a new search and
+        // returns an ID of the search
+        String id = SearchController.getInstance().beginsNewSearch(keyword);
+        if (null != id) {
+            result = new JsonObject();
+            result.addProperty("id", id);
+            res.type("application/json");
         }
         // If the keyword is invalid or not passed, returns a Bad Request
         if (null == result) {
             res.status(HttpStatus.BAD_REQUEST_400);
         }
-        LOGGER.info("Search request for keyword [{}] ended with [{}]", keyword, result);
+        LOGGER.info("Search request for keyword [{}] ended with ID [{}]", keyword, id);
         return result;
     }
 
@@ -64,16 +62,6 @@ public class Controller {
             res.status(HttpStatus.BAD_REQUEST_400);
         }
         return StringUtils.objectToString(result);
-    }
-
-    /**
-     * Validates if the keyword request for searching has length
-     * between 4 and 32, included.
-     * @param keyword The keyword.
-     * @return The keyword validation.
-     */
-    private static boolean validateKeyword(String keyword) {
-        return null != keyword && keyword.length() >= 4 && keyword.length() <= 32;
     }
 
     /**
