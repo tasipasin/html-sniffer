@@ -6,12 +6,19 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Search Controller class.
+ * Search Controller singleton class.
  */
 public class SearchController {
 
+    /** Only instance of Search Controller. */
+    private static SearchController instance;
     /** Result list. */
-    private final List<SearchResult> results = new ArrayList<>();
+    private final List<SearchResult> results;
+
+    private SearchController() {
+        // Singleton class
+        this.results = new ArrayList<>();
+    }
 
     /**
      * Execute procedures to begin a new search and returns an identifier
@@ -43,5 +50,16 @@ public class SearchController {
                 .filter(result -> Objects.equals(result.getId(), idString))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Returns the instance of SearchController.
+     * @return the instance of SearchController.
+     */
+    public static synchronized SearchController getInstance() {
+        if (null == SearchController.instance) {
+            SearchController.instance = new SearchController();
+        }
+        return SearchController.instance;
     }
 }

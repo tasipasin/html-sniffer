@@ -16,8 +16,6 @@ import spark.Response;
 public class Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    /** Search Controller. */
-    private final SearchController search = new SearchController();
     /** Answer result String template. */
     private static final String RESULT_TEMPLATE = "{\"id\": %s}";
 
@@ -34,7 +32,7 @@ public class Controller {
         if (Controller.validateKeyword(keyword)) {
             // Tells the search controller to start a new search and
             // returns an ID of the search
-            String id = search.beginsNewSearch(keyword);
+            String id = SearchController.getInstance().beginsNewSearch(keyword);
             if (null != id) {
                 result = String.format(RESULT_TEMPLATE, id);
             }
@@ -59,7 +57,7 @@ public class Controller {
         String id = request.params("id");
         if (null != id) {
             // Returns the Search Result of the ID
-            result = search.getSearchResultById(id);
+            result = SearchController.getInstance().getSearchResultById(id);
         }
         if (null == result) {
             res.status(HttpStatus.BAD_REQUEST_400);
