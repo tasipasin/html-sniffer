@@ -15,6 +15,9 @@ public class SearchController {
     /** Result list. */
     private final List<SearchResult> results;
 
+    /**
+     * Search Controller singleton class.
+     */
     private SearchController() {
         // Singleton class
         this.results = new ArrayList<>();
@@ -32,8 +35,7 @@ public class SearchController {
             SearchResult sr = new SearchResult();
             this.results.add(sr);
             // Creates a thread to keep searching in background
-            Thread searchThread = new Thread(new Search(sr, keyword));
-            searchThread.start();
+            ThreadPool.getInstance().run(new Search(sr, keyword));
             // Returns the ID
             return sr.getId();
         }
@@ -41,9 +43,9 @@ public class SearchController {
     }
 
     /**
-     * Returns the SearchResult object
-     * @param idString
-     * @return
+     * Returns the SearchResult object from the ID.
+     * @param idString Search ID to be search.
+     * @return the SearchResult object from the ID.
      */
     public SearchResult getSearchResultById(String idString) {
         return this.results.stream()
